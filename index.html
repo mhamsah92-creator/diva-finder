@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>GPS Web App (Gratis)</title>
+  <style>
+    body{font-family:system-ui,Arial,sans-serif;max-width:720px;margin:24px auto;padding:0 16px}
+    button{padding:10px 14px;font-size:16px}
+    .box{margin-top:14px;padding:12px;border:1px solid #ddd;border-radius:10px}
+    a{word-break:break-all}
+  </style>
+</head>
+<body>
+  <h2>Ambil Lokasi (GPS) via Browser</h2>
+  <button id="btn">Ambil Lokasi</button>
+
+  <div class="box" id="out">Klik tombol untuk minta izin lokasi.</div>
+
+  <script>
+    const out = document.getElementById("out");
+    document.getElementById("btn").onclick = () => {
+      if (!navigator.geolocation) {
+        out.textContent = "Browser tidak mendukung Geolocation API.";
+        return;
+      }
+      out.textContent = "Meminta izin lokasi...";
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude;
+          const lon = pos.coords.longitude;
+          const acc = pos.coords.accuracy;
+
+          const gmaps = `https://www.google.com/maps?q=${lat},${lon}`;
+          const osm   = `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lon}#map=18/${lat}/${lon}`;
+
+          out.innerHTML = `
+            <b>Latitude:</b> ${lat}<br/>
+            <b>Longitude:</b> ${lon}<br/>
+            <b>Akurasi:</b> ±${Math.round(acc)} m<br/><br/>
+            <b>Buka peta:</b><br/>
+            <a href="${gmaps}" target="_blank" rel="noopener">Google Maps</a><br/>
+            <a href="${osm}" target="_blank" rel="noopener">OpenStreetMap</a>
+          `;
+        },
+        (err) => {
+          out.textContent = `Gagal ambil lokasi: ${err.message}`;
+        },
+        { enableHighAccuracy: true, timeout: 15000 }
+      );
+    };
+  </script>
+</body>
+</html>
